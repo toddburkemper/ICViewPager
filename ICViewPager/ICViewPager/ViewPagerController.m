@@ -761,7 +761,7 @@
         // We will iterate through all of the tabs to update its label textColor to the default color
         [self.tabs enumerateObjectsUsingBlock:^(TabView *tabView, NSUInteger index, BOOL *stop) {
             UILabel *labelSubview = tabView.subviews[0];
-            labelSubview.textColor = self.activeLabelColor;
+            labelSubview.textColor = self.defaultLabelColor;
         }];
         
         // Update defaultLabelColor to check again later
