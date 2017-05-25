@@ -64,8 +64,6 @@
 @interface TabView : UIView
 @property (nonatomic, getter = isSelected) BOOL selected;
 @property (nonatomic) UIColor *indicatorColor;
-@property (nonatomic) UIColor *defaultLabelColor;
-@property (nonatomic) UIColor *activeLabelColor;
 @end
 
 @implementation TabView
@@ -760,27 +758,29 @@
     
     if (![self.defaultLabelColor isEqualToColor:defaultLabelColor]) {
         
-        // We will iterate through all of the tabs to update its indicatorColor
+        // We will iterate through all of the tabs to update its label textColor to the default color
         [self.tabs enumerateObjectsUsingBlock:^(TabView *tabView, NSUInteger index, BOOL *stop) {
-            tabView.defaultLabelColor = defaultLabelColor;
+            UILabel *labelSubview = tabView.subviews[0];
+            labelSubview.textColor = self.activeLabelColor;
         }];
         
-        // Update indicatorColor to check again later
+        // Update defaultLabelColor to check again later
         self.defaultLabelColor = defaultLabelColor;
     }
     
-    // Get indicatorColor and check if it is different from the current one
+    // Get activeLabelColor and check if it is different from the current one
     // If it is, update it
     activeLabelColor = [self.delegate viewPager:self colorForComponent:ViewPagerActiveLabelColor withDefault:kActiveColor];
     
     if (![self.activeLabelColor isEqualToColor:activeLabelColor]) {
         
-        // We will iterate through all of the tabs to update its indicatorColor
-        [self.tabs enumerateObjectsUsingBlock:^(TabView *tabView, NSUInteger index, BOOL *stop) {
-            tabView.activeLabelColor = activeLabelColor;
-        }];
+        // Get the active tab and update its label textColor to the active color
+        TabView *activeTabView = [self tabViewAtIndex:self.activeTabIndex];
+        activeTabView.selected = YES;
+        UILabel *labelSubview = activeTabView.subviews[0];
+        labelSubview.textColor = self.activeLabelColor;
         
-        // Update indicatorColor to check again later
+        // Update activeLabelColor to check again later
         self.activeLabelColor = activeLabelColor;
     }
     
