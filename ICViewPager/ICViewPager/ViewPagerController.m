@@ -25,6 +25,8 @@
 #define kIndicatorColor [UIColor colorWithRed:178.0/255.0 green:203.0/255.0 blue:57.0/255.0 alpha:0.75]
 #define kTabsViewBackgroundColor [UIColor colorWithRed:234.0/255.0 green:234.0/255.0 blue:234.0/255.0 alpha:0.75]
 #define kContentViewBackgroundColor [UIColor colorWithRed:248.0/255.0 green:248.0/255.0 blue:248.0/255.0 alpha:0.75]
+#define kDefaultColor [UIColor colorWithRed:0/255.0 green:0/255.0 blue:0/255.0 alpha:0.75]
+#define kActiveColor [UIColor colorWithRed:178.0/255.0 green:203.0/255.0 blue:57.0/255.0 alpha:0.75]
 
 #pragma mark - UIColor+Equality
 @interface UIColor (Equality)
@@ -62,6 +64,8 @@
 @interface TabView : UIView
 @property (nonatomic, getter = isSelected) BOOL selected;
 @property (nonatomic) UIColor *indicatorColor;
+@property (nonatomic) UIColor *defaultLabelColor;
+@property (nonatomic) UIColor *activeLabelColor;
 @end
 
 @implementation TabView
@@ -147,6 +151,8 @@
 @property (nonatomic) UIColor *indicatorColor;
 @property (nonatomic) UIColor *tabsViewBackgroundColor;
 @property (nonatomic) UIColor *contentViewBackgroundColor;
+@property (nonatomic) UIColor *defaultLabelColor;
+@property (nonatomic) UIColor *activeLabelColor;
 
 @end
 
@@ -321,10 +327,14 @@
     // Set to-be-inactive tab unselected
     activeTabView = [self tabViewAtIndex:self.activeTabIndex];
     activeTabView.selected = NO;
+    UILabel *labelSubview = activeTabView.subviews[0];
+    labelSubview.textColor = self.defaultLabelColor;
     
     // Set to-be-active tab selected
     activeTabView = [self tabViewAtIndex:activeTabIndex];
     activeTabView.selected = YES;
+    labelSubview = activeTabView.subviews[0];
+    labelSubview.textColor = self.activeLabelColor;
     
     // Set current activeTabIndex
     _activeTabIndex = activeTabIndex;
@@ -549,6 +559,28 @@
     }
     return _contentViewBackgroundColor;
 }
+- (UIColor *)defaultLabelColor {
+    
+    if (!_defaultLabelColor) {
+        UIColor *color = kDefaultColor;
+        if ([self.delegate respondsToSelector:@selector(viewPager:colorForComponent:withDefault:)]) {
+            color = [self.delegate viewPager:self colorForComponent:ViewPagerDefaultLabelColor withDefault:color];
+        }
+        self.defaultLabelColor = color;
+    }
+    return _defaultLabelColor;
+}
+- (UIColor *)activeLabelColor {
+    
+    if (!_activeLabelColor) {
+        UIColor *color = kActiveColor;
+        if ([self.delegate respondsToSelector:@selector(viewPager:colorForComponent:withDefault:)]) {
+            color = [self.delegate viewPager:self colorForComponent:ViewPagerActiveLabelColor withDefault:color];
+        }
+        self.activeLabelColor = color;
+    }
+    return _activeLabelColor;
+}
 
 #pragma mark - Public methods
 - (void)reloadData {
@@ -569,6 +601,8 @@
     _indicatorColor = nil;
     _tabsViewBackgroundColor = nil;
     _contentViewBackgroundColor = nil;
+    _defaultLabelColor = nil;
+    _activeLabelColor = nil;
     
     // Call to setup again with the updated data
     [self defaultSetup];
@@ -676,6 +710,8 @@
     UIColor *indicatorColor;
     UIColor *tabsViewBackgroundColor;
     UIColor *contentViewBackgroundColor;
+    UIColor *defaultLabelColor;
+    UIColor *activeLabelColor;
     
     // Get indicatorColor and check if it is different from the current one
     // If it is, update it
@@ -718,6 +754,36 @@
         self.contentViewBackgroundColor = contentViewBackgroundColor;
     }
     
+    // Get defaultLabelColor and check if it is different from the current one
+    // If it is, update it
+    defaultLabelColor = [self.delegate viewPager:self colorForComponent:ViewPagerDefaultLabelColor withDefault:kDefaultColor];
+    
+    if (![self.defaultLabelColor isEqualToColor:defaultLabelColor]) {
+        
+        // We will iterate through all of the tabs to update its indicatorColor
+        [self.tabs enumerateObjectsUsingBlock:^(TabView *tabView, NSUInteger index, BOOL *stop) {
+            tabView.defaultLabelColor = defaultLabelColor;
+        }];
+        
+        // Update indicatorColor to check again later
+        self.defaultLabelColor = defaultLabelColor;
+    }
+    
+    // Get indicatorColor and check if it is different from the current one
+    // If it is, update it
+    activeLabelColor = [self.delegate viewPager:self colorForComponent:ViewPagerActiveLabelColor withDefault:kActiveColor];
+    
+    if (![self.activeLabelColor isEqualToColor:activeLabelColor]) {
+        
+        // We will iterate through all of the tabs to update its indicatorColor
+        [self.tabs enumerateObjectsUsingBlock:^(TabView *tabView, NSUInteger index, BOOL *stop) {
+            tabView.activeLabelColor = activeLabelColor;
+        }];
+        
+        // Update indicatorColor to check again later
+        self.activeLabelColor = activeLabelColor;
+    }
+    
 }
 
 - (CGFloat)valueForOption:(ViewPagerOption)option {
@@ -748,6 +814,10 @@
             return [self tabsViewBackgroundColor];
         case ViewPagerContent:
             return [self contentViewBackgroundColor];
+        case ViewPagerDefaultLabelColor:
+            return [self defaultLabelColor];
+        case ViewPagerActiveLabelColor:
+            return [self activeLabelColor];
         default:
             return [UIColor clearColor];
     }
