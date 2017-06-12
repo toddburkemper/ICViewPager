@@ -14,6 +14,7 @@
  * ViewPagerOptionTabHeight: Tab bar's height, defaults to 44.0
  * ViewPagerOptionTabOffset: Tab bar's offset from left, defaults to 56.0
  * ViewPagerOptionTabWidth: Any tab item's width, defaults to 128.0
+ * ViewPagerOptionTabShadow: 0.0: No tab shadow, Any other value: Tab has a black shadow with that height
  * ViewPagerOptionTabLocation: 1.0: Top, 0.0: Bottom, Defaults to Top
  * ViewPagerOptionStartFromSecondTab: 1.0: YES, 0.0: NO, defines if view should appear with the 1st or 2nd tab. Defaults to NO
  * ViewPagerOptionCenterCurrentTab: 1.0: YES, 0.0: NO, defines if tabs should be centered, with the given tabWidth. Defaults to NO
@@ -24,6 +25,7 @@ typedef NS_ENUM(NSUInteger, ViewPagerOption) {
     ViewPagerOptionTabHeight,
     ViewPagerOptionTabOffset,
     ViewPagerOptionTabWidth,
+    ViewPagerOptionTabShadow,
     ViewPagerOptionTabLocation,
     ViewPagerOptionStartFromSecondTab,
     ViewPagerOptionCenterCurrentTab,
