@@ -217,6 +217,12 @@
         }
     }
     
+    #ifdef __IPHONE_11_0
+        if(@available(iOS 11.0, *)) {
+            topLayoutGuide = self.view.safeAreaInsets.top;
+        }
+    #endif
+    
     CGRect frame = self.tabsView.frame;
     frame.origin.x = 0.0;
     frame.origin.y = [self.tabLocation boolValue] ? topLayoutGuide : CGRectGetHeight(self.view.frame) - [self.tabHeight floatValue];
